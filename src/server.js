@@ -11,7 +11,7 @@ server.use(cors());
 
 server.use("/media", mediaRouters);
 
-console.table(listEndpoints, server);
+console.table(listEndpoints(server));
 server.listen(port, () => {
   console.log("server running on port-", port);
 });
