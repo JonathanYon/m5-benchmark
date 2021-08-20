@@ -48,6 +48,26 @@ mediaRouters.post("/", async (req, res, next) => {
 });
 mediaRouters.put("/:id", async (req, res, next) => {
   try {
+    const films = await getMedias();
+    const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+    if (indexOfFilm !== -1) {
+      const film = films[indexOfFilm];
+      const updateFilm = {
+        ...film,
+        ...req.body,
+        updatedAt: new Date().toISOString,
+      };
+      films.push(updateFilm);
+      await writeMedias(films);
+      res.status(201).send(updateFilm);
+    } else {
+      next(
+        createHttpError(
+          404,
+          `The movie with id ${req.params.id} could NOT found!`
+        )
+      );
+    }
   } catch (error) {
     next(error);
   }
