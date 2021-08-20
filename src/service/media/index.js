@@ -100,8 +100,8 @@ mediaRouters.post(
       if (indexOfFilm !== -1) {
         const updateFilm = {
           ...unchangeFilm,
-          //   ...req.body,
-          //   cover: req.file,
+          ...req.body,
+          Poster: req.file,
           createdAt: new Date(),
         };
         films[indexOfFilm] = updateFilm;

@@ -1,10 +1,11 @@
 import { Router } from "express";
+import { getReviews, writeReviews } from "../../util/fs-tools.js";
 
 const reviewRouter = Router();
 
 reviewRouter.get("/", async (req, res, next) => {
   try {
-    const reviews = await getMedias();
+    const reviews = await getReviews();
     res.status(200).send(reviews);
   } catch (error) {
     next(error);
@@ -12,7 +13,7 @@ reviewRouter.get("/", async (req, res, next) => {
 });
 reviewRouter.get("/:id", async (req, res, next) => {
   try {
-    const reviews = await getMedias();
+    const reviews = await getReviews();
     const review = reviews.find((fil) => fil.id === req.params.id);
     if (review) {
       res.status(200).send(review);
@@ -30,14 +31,14 @@ reviewRouter.get("/:id", async (req, res, next) => {
 });
 reviewRouter.post("/", async (req, res, next) => {
   try {
-    const reviews = await getMedias();
+    const reviews = await getReviews();
     const newReview = {
       ...req.body,
       id: uniqid(),
       createdAt: new Date(),
     };
     reviews.push(newReview);
-    await writeMedias(reviews);
+    await writeReviews(reviews);
     res.status(201).send(newReview);
   } catch (error) {
     next(error);
@@ -45,7 +46,7 @@ reviewRouter.post("/", async (req, res, next) => {
 });
 reviewRouter.put("/:id", async (req, res, next) => {
   try {
-    const reviews = await getMedias();
+    const reviews = await getReviews();
     const indexOfReview = reviews.findIndex((fil) => fil.id === req.params.id);
     if (indexOfReview !== -1) {
       const review = reviews[indexOfReview];
@@ -55,7 +56,7 @@ reviewRouter.put("/:id", async (req, res, next) => {
         updatedAt: new Date(),
       };
       reviews[indexOfReview] = updateReview;
-      await writeMedias(reviews);
+      await writeReviews(reviews);
       res.status(201).send(updateReview);
     } else {
       next(
@@ -71,9 +72,9 @@ reviewRouter.put("/:id", async (req, res, next) => {
 });
 reviewRouter.delete("/:id", async (req, res, next) => {
   try {
-    const reviews = await getMedias();
+    const reviews = await getReviews();
     const allreviews = reviews.filter((review) => review.id !== req.params.id);
-    await writeMedias(allreviews);
+    await writeReviews(allreviews);
     res.status(204).send();
   } catch (error) {
     next(error);
