@@ -7,6 +7,10 @@ const mediaJsonPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../service/data/media.json"
 );
+const reviewJsonPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../service/data/review.json"
+);
 const publicPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../public"
@@ -34,3 +38,5 @@ export const fileParse = (req, res, next) => {
 
 export const getMedias = () => fs.readJSON(mediaJsonPath);
 export const writeMedias = (content) => fs.writeJson(mediaJsonPath, content);
+export const getReviews = () => fs.readJSON(reviewJsonPath);
+export const writeReviews = (content) => fs.writeJson(reviewJsonPath, content);
