@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getMedias, writeMedias } from "../../util/fs-tools.js";
+import {
+  getMedias,
+  writeMedias,
+  upload,
+  fileParse,
+} from "../../util/fs-tools.js";
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
 
@@ -82,5 +87,65 @@ mediaRouters.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
+
+mediaRouters.post(
+  "/:id/poster",
+  upload.single("poster"),
+  fileParse,
+  async (req, res, next) => {
+    try {
+      const films = await getMedias();
+      const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+      const unchangeFilm = films[indexOfFilm];
+      if (indexOfFilm !== -1) {
+        const updateFilm = {
+          ...unchangeFilm,
+          //   ...req.body,
+          //   cover: req.file,
+          createdAt: new Date(),
+        };
+        films[indexOfFilm] = updateFilm;
+        await writeMedias(films);
+        res.status(201).send(updateFilm);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+mediaRouters.put(
+  "/:id/poster",
+  upload.single("poster"),
+  fileParse,
+  async (req, res, next) => {
+    try {
+      const films = await getMedias();
+      const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+      if (indexOfFilm !== -1) {
+        const film = films[indexOfFilm];
+        const updateFilm = {
+          Poster: req.file,
+          ...film,
+          ...req.body,
+          updatedAt: new Date(),
+        };
+        console.log(updateFilm);
+        films[indexOfFilm] = updateFilm;
+        await writeMedias(films);
+        res.status(201).send(updateFilm);
+      } else {
+        next(
+          createHttpError(
+            404,
+            `The movie with id ${req.params.id} could NOT found!`
+          )
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default mediaRouters;
