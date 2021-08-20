@@ -74,6 +74,10 @@ mediaRouters.put("/:id", async (req, res, next) => {
 });
 mediaRouters.delete("/:id", async (req, res, next) => {
   try {
+    const films = await getMedias();
+    const allFilms = films.filter((film) => film.id !== req.params.id);
+    await writeMedias(allFilms);
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
