@@ -57,7 +57,7 @@ mediaRouters.put("/:id", async (req, res, next) => {
         ...req.body,
         updatedAt: new Date().toISOString,
       };
-      films.push(updateFilm);
+      films[indexOfFilm] = updateFilm;
       await writeMedias(films);
       res.status(201).send(updateFilm);
     } else {
