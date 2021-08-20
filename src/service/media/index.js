@@ -37,7 +37,7 @@ mediaRouters.post("/", async (req, res, next) => {
     const newFilm = {
       ...req.body,
       id: uniqid(),
-      createdAt: new Date().toISOString,
+      createdAt: new Date(),
     };
     films.push(newFilm);
     await writeMedias(films);
@@ -55,7 +55,7 @@ mediaRouters.put("/:id", async (req, res, next) => {
       const updateFilm = {
         ...film,
         ...req.body,
-        updatedAt: new Date().toISOString,
+        updatedAt: new Date(),
       };
       films[indexOfFilm] = updateFilm;
       await writeMedias(films);
