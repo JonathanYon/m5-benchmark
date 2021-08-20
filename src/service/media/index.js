@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getMedias, writeMedias } from "../../util/fs-tools.js";
 import createHttpError from "http-errors";
+import uniqid from "uniqid";
 
 const mediaRouters = Router();
 
@@ -32,6 +33,15 @@ mediaRouters.get("/:id", async (req, res, next) => {
 });
 mediaRouters.post("/", async (req, res, next) => {
   try {
+    const films = await getMedias();
+    const newFilm = {
+      ...req.body,
+      id: uniqid(),
+      createdAt: new Date().toISOString,
+    };
+    films.push(newFilm);
+    await writeMedias(films);
+    res.status(201).send(newFilm);
   } catch (error) {
     next(error);
   }
