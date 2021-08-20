@@ -7,6 +7,5 @@ const mediaJsonPath = join(
   "../data/media.json"
 );
 
-export const getMedias = () => fs.readFileSync(mediaJsonPath);
-export const writeMedias = (content) =>
-  fs.writeFileSync(mediaJsonPath, content);
+export const getMedias = () => fs.readJSON(mediaJsonPath);
+export const writeMedias = (content) => fs.writeJson(mediaJsonPath, content);
