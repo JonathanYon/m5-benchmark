@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import { fileURLToPath } from "url";
 import { extname, dirname, join } from "path";
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
 
 const mediaJsonPath = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -15,6 +16,14 @@ const publicPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../public"
 );
+
+// const storage = new CloudinaryStorage({
+//   cloudinary,
+//   folder: "netflix",
+// });
+
+// export const parser = multer({ storage: storage });
+
 console.log(mediaJsonPath);
 
 export const upload = multer();

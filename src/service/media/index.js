@@ -42,7 +42,7 @@ mediaRouters.post("/", async (req, res, next) => {
     const newFilm = {
       ...req.body,
       id: uniqid(),
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
     films.push(newFilm);
     await writeMedias(films);
@@ -60,7 +60,7 @@ mediaRouters.put("/:id", async (req, res, next) => {
       const updateFilm = {
         ...film,
         ...req.body,
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
       };
       films[indexOfFilm] = updateFilm;
       await writeMedias(films);
@@ -88,6 +88,7 @@ mediaRouters.delete("/:id", async (req, res, next) => {
   }
 });
 
+//post Poster to the local
 mediaRouters.post(
   "/:id/poster",
   upload.single("poster"),
@@ -102,7 +103,7 @@ mediaRouters.post(
           ...unchangeFilm,
           ...req.body,
           Poster: req.file,
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         };
         films[indexOfFilm] = updateFilm;
         await writeMedias(films);
@@ -128,7 +129,7 @@ mediaRouters.put(
           Poster: req.file,
           ...film,
           ...req.body,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         };
         console.log(updateFilm);
         films[indexOfFilm] = updateFilm;
@@ -147,5 +148,34 @@ mediaRouters.put(
     }
   }
 );
+
+mediaRouters.post("/:id/review", async (req, res, next) => {
+  try {
+    const films = await getMedias();
+    const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+    if (indexOfFilm !== -1) {
+      const unchangeFilm = films[indexOfFilm];
+      const changedFilm = {
+        ...unchangeFilm,
+        reviews: [
+          {
+            ...req.body,
+            elementId: req.params.id,
+            _id: uniqid(),
+            createdAt: new Date().toISOString(),
+          },
+        ],
+      };
+      films[indexOfFilm] = changedFilm;
+      films.push(changedFilm);
+      await writeMedias(films);
+      res.status(201).send(changedFilm);
+    } else {
+      next(createHttpError(404, `Id ${req.params.id} NOT found!`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default mediaRouters;
