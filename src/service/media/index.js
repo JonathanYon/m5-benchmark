@@ -7,9 +7,11 @@ import {
 } from "../../util/fs-tools.js";
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
+import axios from "axios";
 
 const mediaRouters = Router();
 
+// get all film
 mediaRouters.get("/", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -18,6 +20,16 @@ mediaRouters.get("/", async (req, res, next) => {
     next(error);
   }
 });
+// serch by title
+mediaRouters.get("/", async (req, res, next) => {
+  try {
+    const films = await getMedias();
+    res.status(200).send(films);
+  } catch (error) {
+    next(error);
+  }
+});
+//get one film
 mediaRouters.get("/:id", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -36,6 +48,7 @@ mediaRouters.get("/:id", async (req, res, next) => {
     next(error);
   }
 });
+//post film
 mediaRouters.post("/", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -51,6 +64,7 @@ mediaRouters.post("/", async (req, res, next) => {
     next(error);
   }
 });
+//update film
 mediaRouters.put("/:id", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -77,6 +91,7 @@ mediaRouters.put("/:id", async (req, res, next) => {
     next(error);
   }
 });
+//delete film
 mediaRouters.delete("/:id", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -87,7 +102,6 @@ mediaRouters.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
-
 //post Poster to the local
 mediaRouters.post(
   "/:id/poster",
@@ -116,7 +130,7 @@ mediaRouters.post(
     }
   }
 );
-
+//update Poster to the local
 mediaRouters.put(
   "/:id/poster",
   upload.single("poster"),
@@ -152,7 +166,7 @@ mediaRouters.put(
     }
   }
 );
-
+//post review
 mediaRouters.post("/:id/review", async (req, res, next) => {
   try {
     const films = await getMedias();
@@ -196,18 +210,18 @@ mediaRouters.post("/:id/review", async (req, res, next) => {
     next(error);
   }
 });
-
+// delete review
 mediaRouters.delete("/:id/review/:commentId", async (req, res, next) => {
   try {
     const films = await getMedias();
     // console.log("allfilms-->", films);
     const film = films.find((fil) => fil.imdbID === req.params.id);
-    console.log("film-->", film);
+    // console.log("film-->", film);
     if (film) {
       const allReviews = film.reviews.filter(
         (review) => review._id !== req.params.commentId
       );
-      console.log("film-->", allReviews);
+      // console.log("film-->", allReviews);
       film.reviews = allReviews;
       await writeMedias(films);
       res.send();
