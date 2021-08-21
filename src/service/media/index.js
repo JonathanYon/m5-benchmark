@@ -41,7 +41,7 @@ mediaRouters.post("/", async (req, res, next) => {
     const films = await getMedias();
     const newFilm = {
       ...req.body,
-      id: uniqid(),
+      imdbID: uniqid(),
       createdAt: new Date().toISOString(),
     };
     films.push(newFilm);
