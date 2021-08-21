@@ -153,21 +153,43 @@ mediaRouters.post("/:id/review", async (req, res, next) => {
   try {
     const films = await getMedias();
     const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
-    if (indexOfFilm !== -1) {
-      const unchangeFilm = films[indexOfFilm];
-      const changedFilm = {
+    const film = films.find((fil) => fil.id === req.params.id);
+    // const review = films.reviews.filter(comment => comment.id === comment._id)
+    if (indexOfFilm !== -1 && film.reviews === undefined) {
+      let unchangeFilm = films[indexOfFilm];
+      let changedFilm = {
         ...unchangeFilm,
         reviews: [
           {
             ...req.body,
-            elementId: req.params.id,
+            elementID: req.params.id,
             _id: uniqid(),
             createdAt: new Date().toISOString(),
           },
         ],
       };
+
       films[indexOfFilm] = changedFilm;
-      films.push(changedFilm);
+      await writeMedias(films);
+      res.status(201).send(changedFilm);
+      console.log(
+        req.body,
+        unchangeFilm.reviews,
+        unchangeFilm.Year,
+        changedFilm
+      );
+    } else if (indexOfFilm !== -1 && film.reviews) {
+      let unchangeFilm = films[indexOfFilm];
+      let changedFilm = {
+        ...unchangeFilm,
+      };
+      changedFilm.reviews.push({
+        ...req.body,
+        elementID: req.params.id,
+        _id: uniqid(),
+        createdAt: new Date().toISOString(),
+      });
+      films[indexOfFilm] = changedFilm;
       await writeMedias(films);
       res.status(201).send(changedFilm);
     } else {
