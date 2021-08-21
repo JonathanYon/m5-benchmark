@@ -21,7 +21,7 @@ mediaRouters.get("/", async (req, res, next) => {
 mediaRouters.get("/:id", async (req, res, next) => {
   try {
     const films = await getMedias();
-    const film = films.find((fil) => fil.id === req.params.id);
+    const film = films.find((fil) => fil.imdbID === req.params.id);
     if (film) {
       res.status(200).send(film);
     } else {
@@ -54,7 +54,7 @@ mediaRouters.post("/", async (req, res, next) => {
 mediaRouters.put("/:id", async (req, res, next) => {
   try {
     const films = await getMedias();
-    const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+    const indexOfFilm = films.findIndex((fil) => fil.imdbID === req.params.id);
     if (indexOfFilm !== -1) {
       const film = films[indexOfFilm];
       const updateFilm = {
@@ -96,7 +96,9 @@ mediaRouters.post(
   async (req, res, next) => {
     try {
       const films = await getMedias();
-      const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+      const indexOfFilm = films.findIndex(
+        (fil) => fil.imdbID === req.params.id
+      );
       const unchangeFilm = films[indexOfFilm];
       if (indexOfFilm !== -1) {
         const updateFilm = {
@@ -122,7 +124,9 @@ mediaRouters.put(
   async (req, res, next) => {
     try {
       const films = await getMedias();
-      const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
+      const indexOfFilm = films.findIndex(
+        (fil) => fil.imdbID === req.params.id
+      );
       if (indexOfFilm !== -1) {
         const film = films[indexOfFilm];
         const updateFilm = {
@@ -152,9 +156,8 @@ mediaRouters.put(
 mediaRouters.post("/:id/review", async (req, res, next) => {
   try {
     const films = await getMedias();
-    const indexOfFilm = films.findIndex((fil) => fil.id === req.params.id);
-    const film = films.find((fil) => fil.id === req.params.id);
-    // const review = films.reviews.filter(comment => comment.id === comment._id)
+    const indexOfFilm = films.findIndex((fil) => fil.imdbID === req.params.id);
+    const film = films.find((fil) => fil.imdbID === req.params.id);
     if (indexOfFilm !== -1 && film.reviews === undefined) {
       let unchangeFilm = films[indexOfFilm];
       let changedFilm = {
@@ -172,12 +175,6 @@ mediaRouters.post("/:id/review", async (req, res, next) => {
       films[indexOfFilm] = changedFilm;
       await writeMedias(films);
       res.status(201).send(changedFilm);
-      console.log(
-        req.body,
-        unchangeFilm.reviews,
-        unchangeFilm.Year,
-        changedFilm
-      );
     } else if (indexOfFilm !== -1 && film.reviews) {
       let unchangeFilm = films[indexOfFilm];
       let changedFilm = {
@@ -197,6 +194,28 @@ mediaRouters.post("/:id/review", async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+});
+
+mediaRouters.delete("/:id/review/:commentId", async (req, res, next) => {
+  try {
+    const films = await getMedias();
+    // console.log("allfilms-->", films);
+    const film = films.find((fil) => fil.imdbID === req.params.id);
+    console.log("film-->", film);
+    if (film) {
+      const allReviews = film.reviews.filter(
+        (review) => review._id !== req.params.commentId
+      );
+      console.log("film-->", allReviews);
+      film.reviews = allReviews;
+      await writeMedias(films);
+      res.send();
+    } else {
+      next(createHttpError(404, `${req.params.id} is not Found!`));
+    }
+  } catch (error) {
+    next();
   }
 });
 
