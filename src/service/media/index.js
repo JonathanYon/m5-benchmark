@@ -28,17 +28,24 @@ mediaRouters.get("/search", async (req, res, next) => {
   try {
     const films = await getMedias();
     // console.log("all them films", films);
-    console.log(req.query);
-    console.log("title", req.query.Title);
-    if (req.query) {
-      const movies = films.filter((film) =>
-        film.Title.toLowerCase().includes(req.query.Title.toLowerCase())
-      );
+    // console.log(req.query);
+    // console.log("title", req.query.Title);
+    // if (req.query) {
+    const movies = films.filter((film) =>
+      film.Title.toLowerCase().includes(req.query.Title.toLowerCase())
+    );
+    if (movies.length > 0) {
       res.send(movies);
     } else {
-      res.send(films);
+      const omdb = await axios.get(
+        `http://www.omdbapi.com/?s=${req.query.Title}&apikey=${process.env.OMDB_KEY}`
+      );
+
+      console.log(omdb.data.Search);
+      const datas = omdb.data.Search;
+      datas.forEach((one) => films.push(one));
+      res.send(datas);
     }
-    console.log(movies);
   } catch (error) {
     next(error);
   }
