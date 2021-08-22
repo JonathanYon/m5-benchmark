@@ -14,29 +14,29 @@ import axios from "axios";
 const mediaRouters = Router();
 
 // get all film
-mediaRouters.get("/", async (req, res, next) => {
+// mediaRouters.get("/", async (req, res, next) => {
+//   try {
+//     const films = await getMedias();
+//     // console.log("all them films", films);
+//     res.status(200).send(films);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+// search by title
+mediaRouters.get("/search", async (req, res, next) => {
   try {
     const films = await getMedias();
     // console.log("all them films", films);
-    res.status(200).send(films);
-  } catch (error) {
-    next(error);
-  }
-});
-// search by title
-mediaRouters.get("/", async (req, res, next) => {
-  try {
-    const films = await getMedias();
-    console.log("all them films", films);
     console.log(req.query);
     console.log("title", req.query.Title);
-    if (req.query && req.query.Title) {
-      const movies = films.filter(
-        (film) => film.Title.toLowerCase() === req.query.toLowerCase()
+    if (req.query) {
+      const movies = films.filter((film) =>
+        film.Title.toLowerCase().includes(req.query.Title.toLowerCase())
       );
       res.send(movies);
     } else {
-      res.send("not found");
+      res.send(films);
     }
     console.log(movies);
   } catch (error) {
