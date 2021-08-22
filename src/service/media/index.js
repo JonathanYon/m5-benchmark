@@ -7,6 +7,8 @@ import {
 } from "../../util/fs-tools.js";
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
+import { validationResult } from "express-validator";
+import { mediaValidator } from "./validation.js";
 import axios from "axios";
 
 const mediaRouters = Router();
@@ -28,15 +30,15 @@ mediaRouters.get("/", async (req, res, next) => {
     console.log("all them films", films);
     console.log(req.query);
     console.log("title", req.query.Title);
-    // if (req.query && req.query.Title) {
-    //   const movies = films.filter(
-    //     (film) => film.Title.toLowerCase() === req.query.toLowerCase()
-    //   );
-    //   res.send(movies);
-    // } else {
-    //   res.send("not found");
-    // }
-    // console.log(movies);
+    if (req.query && req.query.Title) {
+      const movies = films.filter(
+        (film) => film.Title.toLowerCase() === req.query.toLowerCase()
+      );
+      res.send(movies);
+    } else {
+      res.send("not found");
+    }
+    console.log(movies);
   } catch (error) {
     next(error);
   }
@@ -61,17 +63,22 @@ mediaRouters.get("/:id", async (req, res, next) => {
   }
 });
 //post film
-mediaRouters.post("/", async (req, res, next) => {
+mediaRouters.post("/", mediaValidator, async (req, res, next) => {
   try {
     const films = await getMedias();
-    const newFilm = {
-      ...req.body,
-      imdbID: uniqid(),
-      createdAt: new Date().toISOString(),
-    };
-    films.push(newFilm);
-    await writeMedias(films);
-    res.status(201).send(newFilm);
+    const errorList = validationResult(req);
+    if (!errorList.isEmpty()) {
+      next(createHttpError(400, { error: errorList }));
+    } else {
+      const newFilm = {
+        ...req.body,
+        imdbID: uniqid(),
+        createdAt: new Date().toISOString(),
+      };
+      films.push(newFilm);
+      await writeMedias(films);
+      res.status(201).send(newFilm);
+    }
   } catch (error) {
     next(error);
   }
