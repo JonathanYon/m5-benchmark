@@ -8,11 +8,11 @@ export const mediaValidator = [
 ];
 
 export const reviewValidator = [
-  body("reviews.comment")
+  body("comment")
     .isLength({ min: 10 })
     .exists()
     .withMessage("comments should be atleast 10 characters!"),
-  body("reviews.rate")
+  body("rate")
     .exists()
     .isFloat({ min: 1, max: 5 })
     .withMessage("Rate is Required!"),

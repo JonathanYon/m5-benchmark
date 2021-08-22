@@ -56,6 +56,23 @@
         "Type": "movie",
         "Year": "2020",
         "imdbID": "1snmrcl8ksm632ws",
-        "createdAt": "2021-08-21T19:21:04.635Z"
+        "createdAt": "2021-08-22T07:50:13.197Z",
+        "Poster": "http://localhost:3003/1snmrcl8ksm632ws.jpg",
+        "reviews": [
+            {
+                "comment": "not neccessary but what the hell",
+                "rate": "1",
+                "elementID": "1snmrcl8ksm632ws",
+                "_id": "1snmrfzsksmx63ul",
+                "createdAt": "2021-08-22T07:59:15.452Z"
+            }
+        ]
+    },
+    {
+        "Title": "another one",
+        "Type": "movie",
+        "Year": "1993",
+        "imdbID": "1snmrfqoksmwyfea",
+        "createdAt": "2021-08-22T07:53:17.169Z"
     }
 ]
