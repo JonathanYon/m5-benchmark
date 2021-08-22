@@ -8,7 +8,7 @@ import {
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
 import { validationResult } from "express-validator";
-import { mediaValidator } from "./validation.js";
+import { mediaValidator, reviewValidator } from "./validation.js";
 import axios from "axios";
 
 const mediaRouters = Router();
@@ -186,44 +186,51 @@ mediaRouters.put(
   }
 );
 //post review
-mediaRouters.post("/:id/review", async (req, res, next) => {
+mediaRouters.post("/:id/review", reviewValidator, async (req, res, next) => {
   try {
     const films = await getMedias();
-    const indexOfFilm = films.findIndex((fil) => fil.imdbID === req.params.id);
-    const film = films.find((fil) => fil.imdbID === req.params.id);
-    if (indexOfFilm !== -1 && film.reviews === undefined) {
-      let unchangeFilm = films[indexOfFilm];
-      let changedFilm = {
-        ...unchangeFilm,
-        reviews: [
-          {
-            ...req.body,
-            elementID: req.params.id,
-            _id: uniqid(),
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      };
-
-      films[indexOfFilm] = changedFilm;
-      await writeMedias(films);
-      res.status(201).send(changedFilm);
-    } else if (indexOfFilm !== -1 && film.reviews) {
-      let unchangeFilm = films[indexOfFilm];
-      let changedFilm = {
-        ...unchangeFilm,
-      };
-      changedFilm.reviews.push({
-        ...req.body,
-        elementID: req.params.id,
-        _id: uniqid(),
-        createdAt: new Date().toISOString(),
-      });
-      films[indexOfFilm] = changedFilm;
-      await writeMedias(films);
-      res.status(201).send(changedFilm);
+    const errorList = validationResult(req);
+    if (!errorList.isEmpty()) {
+      next(createHttpError(400, { error: errorList }));
     } else {
-      next(createHttpError(404, `Id ${req.params.id} NOT found!`));
+      const indexOfFilm = films.findIndex(
+        (fil) => fil.imdbID === req.params.id
+      );
+      const film = films.find((fil) => fil.imdbID === req.params.id);
+      if (indexOfFilm !== -1 && film.reviews === undefined) {
+        let unchangeFilm = films[indexOfFilm];
+        let changedFilm = {
+          ...unchangeFilm,
+          reviews: [
+            {
+              ...req.body,
+              elementID: req.params.id,
+              _id: uniqid(),
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        };
+
+        films[indexOfFilm] = changedFilm;
+        await writeMedias(films);
+        res.status(201).send(changedFilm);
+      } else if (indexOfFilm !== -1 && film.reviews) {
+        let unchangeFilm = films[indexOfFilm];
+        let changedFilm = {
+          ...unchangeFilm,
+        };
+        changedFilm.reviews.push({
+          ...req.body,
+          elementID: req.params.id,
+          _id: uniqid(),
+          createdAt: new Date().toISOString(),
+        });
+        films[indexOfFilm] = changedFilm;
+        await writeMedias(films);
+        res.status(201).send(changedFilm);
+      } else {
+        next(createHttpError(404, `Id ${req.params.id} NOT found!`));
+      }
     }
   } catch (error) {
     next(error);
