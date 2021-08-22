@@ -15,16 +15,28 @@ const mediaRouters = Router();
 mediaRouters.get("/", async (req, res, next) => {
   try {
     const films = await getMedias();
+    // console.log("all them films", films);
     res.status(200).send(films);
   } catch (error) {
     next(error);
   }
 });
-// serch by title
+// search by title
 mediaRouters.get("/", async (req, res, next) => {
   try {
     const films = await getMedias();
-    res.status(200).send(films);
+    console.log("all them films", films);
+    console.log(req.query);
+    console.log("title", req.query.Title);
+    // if (req.query && req.query.Title) {
+    //   const movies = films.filter(
+    //     (film) => film.Title.toLowerCase() === req.query.toLowerCase()
+    //   );
+    //   res.send(movies);
+    // } else {
+    //   res.send("not found");
+    // }
+    // console.log(movies);
   } catch (error) {
     next(error);
   }
